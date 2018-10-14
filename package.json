@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/Heng-Cai/react-init/issues"
   },
-  "homepage": "https://github.com/Heng-Cai/react-init#readme"
+  "homepage": "https://github.com/Heng-Cai/react-init#readme",
+  "devDependencies": {
+    "webpack": "4.20.2",
+    "webpack-cli": "3.1.2"
+  }
 }
