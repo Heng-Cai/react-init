@@ -13,8 +13,10 @@ module.exports = {
   module: {
     rules: [
       {
+        // 正则匹配
         test: /\.css$/,
-        use: [ 'css-loader' ],
+        // 从右向左依次 loader
+        use: [ 'style-loader', 'css-loader' ],
       }
     ]
   }

@@ -1,13 +1,4 @@
-import css from'./style.css';
-
-console.log('***css***', css);
-// [
-//   [3,"body {\n  background-color: aqua;\n}\n",""],
-//   [0,"div {\n  color: red;\n}\n",""]
-// ]
-
-console.log('***css***', css.toString());
-// "body {\n  background-color: aqua;\n}\n  div {\n  color: red;\n}\n"
+import './style.css';
 
 function component() {
   const element = document.createElement('div');

@@ -168,3 +168,67 @@ Entrypoint main = script.js
 >
 > ./src/_part.css <=> 3
 
+### style-loader
+
+将 css-loader toString() 之后的 css 字符串以 `<style>` 标签包裹，并在页面加载时动态插入 `<head>` (查看源代码的 index.html 不会变化)
+
+```javascript
+document.createElement('style');
+```
+
+安装 css-loader
+
+```bash
+npm install --save-dev style-loader
+```
+
+webpack.config.js
+
+```javascript
+module: {
+  rules: [
+    {
+      test: /\.css$/,
+      // 从右向左依次 loader
+      use: [ 'style-loader', 'css-loader' ],
+    }
+  ]
+}
+```
+
+```bash
+npm run build
+
+# output
+Hash: cf9323d99eba35e639f1
+Version: webpack 4.20.2
+Time: 810ms
+Built at: 2018-10-15 22:57:21
+    Asset      Size  Chunks             Chunk Names
+script.js  7.02 KiB       0  [emitted]  main
+Entrypoint main = script.js
+[1] ./src/index.js 193 bytes {0} [built]
+[2] ./src/style.css 1.05 KiB {0} [built]
+[3] ./node_modules/css-loader!./src/style.css 260 bytes {0} [built]
+[4] ./node_modules/css-loader!./src/_part.css 197 bytes {0} [built]
+```
+
+> webpack 打包生成的 script.js 文件中增加了动态插入 `<style>` 标签的代码，从而在页面加载时使样式生效
+
+Chrome 控制台 element
+
+```html
+<head>
+<style type="text/css">body {
+  background-color: aqua;
+}
+</style>
+<style type="text/css">div {
+  color: red;
+}
+</style>
+</head>
+```
+
+> [3], [4] 打包编号对应动态插入的两个 `<style>` 标签
+
