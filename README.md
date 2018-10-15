@@ -83,3 +83,88 @@ Entrypoint main = script.js
 [0] ./src/index.js 170 bytes {0} [built]
 ```
 
+# 静态资源管理
+
+## css
+
+### css-loader
+
+将 css 转化为数组，并在数组中重写 toString() 方法，可将 css 转化为字符串
+
+安装 css-loader
+
+```bash
+npm install --save-dev css-loader
+```
+
+./src/style.css
+
+```css
+@import './_part.css';
+
+div {
+  color: red;
+}
+```
+
+./src/_part.css
+
+```css
+body {
+  background-color: aqua;
+}
+```
+
+./src/index.js
+
+```javascript
+import css from'./style.css';
+
+console.log('***css***', css);
+// output
+[
+  [3,"body {\n  background-color: aqua;\n}\n",""],
+  [0,"div {\n  color: red;\n}\n",""]
+]
+
+// Array 同时有一个重写的 toString() 方法, 将 css 转化为字符串
+console.log('***css***', css.toString());
+// output
+"body {\n  background-color: aqua;\n}\n  div {\n  color: red;\n}\n"
+```
+
+webpack.config.js
+
+```javascript
+module: {
+  rules: [
+    {
+      test: /\.css$/,
+      use: [ 'css-loader' ],
+    }
+  ]
+}
+```
+
+```bash
+npm run build
+
+# output
+Hash: 1d9cfe9508e783eac203
+Version: webpack 4.20.2
+Time: 312ms
+Built at: 2018-10-15 11:44:28
+    Asset      Size  Chunks             Chunk Names
+script.js  2.11 KiB       0  [emitted]  main
+Entrypoint main = script.js
+[0] ./src/style.css 260 bytes {0} [built]
+[2] ./src/index.js 274 bytes {0} [built]
+[3] ./node_modules/css-loader!./src/_part.css 197 bytes {0} [built]
+```
+
+> 输出的 css 的数组的第一个元素与打包编号向对应
+>
+> ./src/style.css <=> 0
+>
+> ./src/_part.css <=> 3
+
