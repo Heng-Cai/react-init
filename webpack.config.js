@@ -1,5 +1,4 @@
 const path = require('path');
-
 module.exports = {
   // 入口文件路径
   entry: './src/index.js',
@@ -17,7 +16,11 @@ module.exports = {
         test: /\.css$/,
         // 从右向左依次 loader
         use: [ 'style-loader', 'css-loader' ],
-      }
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [ 'file-loader' ],
+      },
     ]
   }
 };

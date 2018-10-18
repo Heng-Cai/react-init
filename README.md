@@ -232,3 +232,86 @@ Chrome 控制台 element
 
 > [3], [4] 打包编号对应动态插入的两个 `<style>` 标签
 
+## image
+
+### file-loader
+
+安装 css-loader
+
+```bash
+npm install --save-dev file-loader
+```
+
+./src/bg.png (加入的图片)
+
+./src/_part.css (引入图片)
+
+```css
+body {
+  background-image: url('./bg.png');
+}
+```
+
+./src/index.js (引入图片)
+
+```javascript
+import BackgroundImage from './bg.png';
+```
+
+webpack.config.js
+
+```javascript
+module: {
+  rules: [
+    {
+      test: /\.(png|svg|jpg|gif)$/,
+      use: [ 'file-loader' ],
+    },
+  ]
+}
+```
+
+```bash
+npm run build
+
+# output
+Hash: 9d2910f0fec6c0731a36
+Version: webpack 4.20.2
+Time: 331ms
+Built at: 2018-10-18 22:14:28
+                               Asset      Size  Chunks                    Chunk Names
+53f4717a650a18c3ef5f081ea05de980.png   279 KiB          [emitted]  [big]
+                           script.js  7.39 KiB       0  [emitted]         main
+Entrypoint main = script.js
+[0] ./src/bg.png 82 bytes {0} [built]
+[2] ./src/index.js 394 bytes {0} [built]
+[3] ./src/style.css 1.05 KiB {0} [built]
+[4] ./node_modules/css-loader!./src/style.css 260 bytes {0} [built]
+[5] ./node_modules/css-loader!./src/_part.css 303 bytes {0} [built]
+```
+
+> ./src/bg.png 被复制到了 ./dist/53f4717a650a18c3ef5f081ea05de980.png
+
+Chrome 控制台 element
+
+```html
+<head>
+<style type="text/css">body {
+  background-image: url(53f4717a650a18c3ef5f081ea05de980.png);
+}
+</style>
+</head>
+<body>
+<img src="53f4717a650a18c3ef5f081ea05de980.png"></img>
+</body>
+```
+
+鼠标悬浮时会显示图片路径：
+
+file:///project_local_path/53f4717a650a18c3ef5f081ea05de980.png
+
+可以看到，webpack 复制的图片不在此路径上，而在：
+
+file:///project_local_path/dist/53f4717a650a18c3ef5f081ea05de980.png
+
+因此无法显示该图片
