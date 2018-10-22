@@ -6,6 +6,8 @@ npm install --save-dev webpack-cli
 # 4.0 以后版本的 webpack 和 webpack-cli 分离，需分别安装
 ```
 
+> 项目目录：/Users/xxx/workspace/react-init <=> ./
+
 # webpack 起步
 
 - index.html
@@ -42,7 +44,7 @@ module.exports = {
     filename: 'script.js',
 
     // 出口文件路径
-    path: path.resolve(__dirname, 'dist'), // Node 环境下，__dirname 为当前文件所在的绝对路径
+    path: path.resolve(__dirname, 'dist'), // Node 环境下，__dirname 为当前文件夹所在的绝对路径
   }
 };
 ```
@@ -306,12 +308,177 @@ Chrome 控制台 element
 </body>
 ```
 
-鼠标悬浮时会显示图片路径：
+鼠标悬浮时会显示图片路径 (类似 url 链接)：
 
-file:///project_local_path/53f4717a650a18c3ef5f081ea05de980.png
+file:///Users/xxx/workspace/react-init/53f4717a650a18c3ef5f081ea05de980.png (引用图片的路径)
 
 可以看到，webpack 复制的图片不在此路径上，而在：
 
-file:///project_local_path/dist/53f4717a650a18c3ef5f081ea05de980.png
+file:///Users/xxx/workspace/react-init/dist/53f4717a650a18c3ef5f081ea05de980.png (输出图片的路径)
 
 因此无法显示该图片
+
+#### output.path
+
+代表本地输出文件的**绝对路径**，[默认值为](https://github.com/webpack/webpack/blob/master/lib/WebpackOptionsDefaulter.js#L152)
+
+```javascript
+this.set("output.path", path.join(process.cwd(), "dist"));
+
+// process.cwd() 为 node API，表示当前 node 进程所运行的文件夹目录
+```
+
+webpack.config.js
+
+```javascript
+console.log('***process.cwd()***', process.cwd());
+// ***process.cwd()*** /Users/xxx/workspace/react-init
+
+console.log('***__dirname***', __dirname);
+// ***__dirname*** /Users/xxx/workspace/react-init
+```
+
+#### output.publicPath
+
+代表线上引用文件的路径，可为相对路径，也可为绝对路径，默认值为空字符串
+
+该路径是所有打包生成文件的 URL 的前缀，因此一般以 '/' 结尾
+
+```javascript
+module.exports = {
+  output: {
+    // One of the below
+    publicPath: 'https://cdn.example.com/assets/', // CDN (always HTTPS)
+    publicPath: '//cdn.example.com/assets/', // CDN (same protocol)
+    publicPath: '/assets/', // server-relative
+    publicPath: 'assets/', // relative to HTML page
+    publicPath: '../assets/', // relative to HTML page
+    publicPath: '', // relative to HTML page (same directory)
+    publicPath: './', // relative to HTML page (same directory)
+  }
+};
+```
+
+> 相对于 HTML page 在本项目中即指相对于 index.html 所在文件夹：/Users/xxx/workspace/react-init
+
+#### file-loader.outputPath
+
+默认值为 `undefined`
+
+设置 loader 文件输出的绝对路径：
+
+```bash
+OUTPUT_PATH = output.path + (file-loader.outputPath || '') + file-loader.name
+```
+
+因此当未设置 file-loader.outputPath 时，输出的图片的绝对路径为：
+
+```bash
+/Users/xxx/workspace/react-init/dist/53f4717a650a18c3ef5f081ea05de980.png
+
+# output.path
+/Users/xxx/workspace/react-init/dist
+# file-loader.name
+53f4717a650a18c3ef5f081ea05de980.png
+```
+
+若设置 webpack.config.js
+
+```javascript
+{
+  test: /\.(png|svg|jpg|gif)$/,
+  use: [
+    {
+      loader: 'file-loader',
+      options: {
+        outputPath: 'img/',
+      },
+    },
+  ],
+},
+```
+
+则输出图片的绝对路径为
+
+```bash
+/Users/xxx/workspace/react-init/dist/img/53f4717a650a18c3ef5f081ea05de980.png
+
+# output.path
+/Users/xxx/workspace/react-init/dist
+# (file-loader.outputPath
+img/
+# file-loader.name
+53f4717a650a18c3ef5f081ea05de980.png
+```
+
+#### file-loader.publicPath
+
+默认值为 undefined 
+
+设置 loader 文件的引用路径：
+
+```bash
+PUBLIC_PATH = output.publicPath + (file-loader.publicPath || '') + file-loader.name
+```
+
+因此当未设置 output.publicPath 以及 file-loader.publicPath 时，引用图片的路径为：
+
+```bash
+/Users/xxx/workspace/react-init/53f4717a650a18c3ef5f081ea05de980.png
+
+# HTML page
+/Users/xxx/workspace/react-init
+# output.publicPath
+''
+# file-loader.name
+53f4717a650a18c3ef5f081ea05de980.png
+```
+
+若设置 webpack.config.js
+
+```javascript
+{
+  test: /\.(png|svg|jpg|gif)$/,
+  use: [
+    {
+      loader: 'file-loader',
+      options: {
+        outputPath: 'img/',
+        publicPath: 'dist/img/'
+      },
+    },
+  ],
+},
+```
+
+则引用路径变为为
+
+```bash
+/Users/xxx/workspace/react-init/dist/img/53f4717a650a18c3ef5f081ea05de980.png
+
+# HTML page
+/Users/xxx/workspace/react-init
+# output.publicPath
+''
+# file-loader.publicPath
+'dist/img/'
+# file-loader.name
+53f4717a650a18c3ef5f081ea05de980.png
+```
+
+于是就可以将图片显示出来了
+
+Chrome 控制台 element
+
+```html
+<head>
+<style type="text/css">body {
+  background-image: url(dist/img/53f4717a650a18c3ef5f081ea05de980.png);
+}
+</style>
+</head>
+<body>
+<img src="dist/img/53f4717a650a18c3ef5f081ea05de980.png"></img>
+</body>
+```
+
