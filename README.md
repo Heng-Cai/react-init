@@ -238,7 +238,7 @@ Chrome 控制台 element
 
 ### file-loader
 
-安装 css-loader
+安装 file-loader
 
 ```bash
 npm install --save-dev file-loader
@@ -258,6 +258,9 @@ body {
 
 ```javascript
 import BackgroundImage from './bg.png';
+
+const imgElement = new Image();
+imgElement.src = BackgroundImage;
 ```
 
 webpack.config.js
@@ -482,3 +485,85 @@ Chrome 控制台 element
 </body>
 ```
 
+### url-loader
+
+安装 url-loader
+
+```bash
+npm install --save-dev url-loader
+```
+
+- 当文件满足 url-loader.limit 限制时，返回文件的 DataURL (base64)
+- 当文件不满足 url-loader.limit 限制时，则按 (url-loader.fallback || 'file-loader') 中设置的 loader 来处理
+- url-loader 中定义的 options 对 fallback 也生效
+
+./src/icon.png (新增图片)
+
+./src/index.js (引入新增图片)
+
+```javascript
+import Icon from './icon.png';
+
+const imgElement = new Image();
+imgElement.src = Icon;
+```
+
+Webpack.config.js
+
+```javascript
+{
+  test: /\.(png|svg|jpg|gif)$/,
+  use: [
+    {
+      loader: 'url-loader',
+      options: {
+        limit: 50000, // 限制大小 (b)
+        outputPath: 'img/', // 可用于 fallback-loader
+        publicPath: 'dist/img/', // 可用于 fallback-loader
+      },
+    },
+  ],
+},
+```
+
+```bash
+npm run build
+
+# output
+Hash: 2007f37c046caf479531
+Version: webpack 4.20.2
+Time: 398ms
+Built at: 2018-10-23 17:47:54
+                                   Asset      Size  Chunks                    Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png   279 KiB          [emitted]  [big]
+                               script.js  9.15 KiB       0  [emitted]         main
+Entrypoint main = script.js
+[1] ./src/icon.png 1.79 KiB {0} [built]
+[2] ./src/index.js 318 bytes {0} [built]
+[3] ./src/style.css 1.05 KiB {0} [built]
+[4] ./node_modules/css-loader!./src/style.css 260 bytes {0} [built]
+[5] ./node_modules/css-loader!./src/_part.css 303 bytes {0} [built]
+[7] ./src/bg.png 65 bytes {0} [built]
+```
+
+Chrome 控制台 element
+
+```html
+<head>
+<style type="text/css">body {
+  background-image: url(dist/img/53f4717a650a18c3ef5f081ea05de980.png);
+}
+</style>
+</head>
+<body>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA2CAYAAACMRWrdAAAAAXNSR0IArs4c6QAABPlJREFUaAXdmk2MFEUUx/+vZ1dC4uIXhGxiwiLgHvjQA+zBg5kFJIGwtwX1otGL635EooknCAc4EA9Gg/vhzeBFkNseNJhlJ15M1JNhE1fiB9wI8QLBILOz5XtV3eNsT3dv1Ux3T+/WYaY/Xr36/7q6qqvqFSHFpJQiTLyyB7VqGYp2s+t+KLUNRJv4v0cXRXSfj+/xtVt8vghSCyh1V3DxuxtEpNKSQ+060jCjB1+GWn6DfQ1BYUtLPgl3Od8syLuEqevftwvZMpgGGhs8iWV1jmF2tQQTl4lwEx6dweT8lVYBWwJTo4cGUat9BKj9cdrSuU4/o1T6kKbm5l39OYGp8SPbsfTvJNfQUdeC2rInfIOuDWP02bU/bf1Yg6mRcpmdXuWG/4yt81TtiP5mf8M0U6nY+PVsjBjqHQa61jEoESkPlDVoLRaiE2tMXTlRwtzdT9nrmIWvHE1oEoe2vEcnv67FFdoVd0NfLySUKOMHPSdfB4zLT1SKrTH/9ZuJylSYa0Qj3OY+j9ITCaY7CmlTQHdUpgJdq/II5khUh9IEZrr0Rz91tKNweXLSW3Y9diD8KWjuFfV3qkNdugtQYCu9pWgOpRU1ZkYUS9dDNmvjtNR1sHGEUq8xPfbTw6S1wdGkkrVrBv9GHQwyoM187NckJ8ULPG7VDMalBtOkMkovWnp6K/D2aWDDRjtlzBDUmqkxPZ9KeephJyXeSqDe/wQYOAxM8ETCBk6mT8LCyYCZSWJ8IXnfCaA295qSd+51gNMTXnh+1Q3lrT22vDBUYPgcrzQ8/2JwlvQ/JEykxg/vRbX6S5JlbvfioJaXgS/5dfzhWzsp3d37PL3wYmeerVVaUKKSF5M8fzUpW9GreU8TSsriFTLpPPpXKzfT+2lDGbH9AtaXqfAk59lASYl9AmYWMpMEZHEvOyhR28NtzF+hdRHf85SLdbNttlDcxhSDuabjbwFnvwCe3eGa09hnDeWr8ngGet9aoUAdfxN4/Ang1MfucDlBCZPUmB3YMV6aF6ggucLlBSX6OOghYH/J8arp1q9A9dFKM1u4PKFEIUdyBGxxpdqYs4UfgRmeQrjC5Q1l5C9yG+P4lG1yhesMFNeYWvB00M0WTOxWg9v3EnjVCNj1AvABLyIHU4+gDNcBbZDP5Z8DiaSnLe+W7zgH7HYPACPneeWRIWxTHlASQJyubPX8wNqsrba6XVzN1Q1CB3lAmSJnhcl8oCU82koSuGnuUB7+k5y7tgRcumA/n0r2lnzXZ9Hriv7ruNhyyLW3D3j9VPQM9/ZN4DK3td9vJAtK466EeKcr/VJjGkx8qtHyq6ipr9ry37sN2MmdxqYngQf83f+DO9zbv7Xl0ilziV6jqcplyfM/mGxlGBnkdyvruLKTVAdjjlfPzA8EwXjTxoRQ9lhwINvBU7FMJQgvDH6qg8m5XvuWQPZaS6y5cd1e5K8A0zwcnefqk0D22kg6jMSaQ6kJzI8zDbNdNWRbxFPROByOjYnQJjC5qCOERBNyXOjEGqOimaI5EkxumNguR+cLm2jSaIwWGAumzXvBX90iwpntENFI5mr9O5Zk5O8guMg2nQ62SzBdXr/InQKNDFZgkkHvJFhvW44ETDdSjs7zWCX/75zeJMY7Ayz3UWm98uOa1t22vsYHoGcE620jZhPgeto62wgXHOtaDG92NkGPnvpSek6bnf8DllAL2L6D0tkAAAAASUVORK5CYII="></img>
+</body>
+```
+
+- ./src/icon.png
+
+由于其大小满足 url-loader.limit 的限制，会被转化为 base64，并被加入到打包的 ./dist/script.js 中，在 index.html 加载时动态插入到 `<img>` 标签中
+
+- ./src/bg.png
+
+由于其大小超过 url-loader.limit 的限制，会用默认的 file-loader 来处理，被复制到 ./dist/img/53f4717a650a18c3ef5f081ea05de980.png
