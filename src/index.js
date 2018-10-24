@@ -2,7 +2,7 @@ import './style.css';
 import Icon from './icon.png';
 
 function component() {
-  const element = document.createElement('div');
+  const element = documen.createElement('div');
   const imgElement = new Image();
   imgElement.src = Icon;
   element.innerHTML = 'Hello World';

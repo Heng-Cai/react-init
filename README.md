@@ -546,7 +546,7 @@ Entrypoint main = script.js
 [7] ./src/bg.png 65 bytes {0} [built]
 ```
 
-Chrome 控制台 element
+Chrome 控制台 Elements
 
 ```html
 <head>
@@ -686,5 +686,78 @@ npm run build
 clean-webpack-plugin: /Users/caiheng/workspace/react-init/dist has been removed.
 Hash: edccb81ab09906e93c01
 ...
+```
+
+# 开发环境配置
+
+## source maps
+
+将打包编译后的代码 (如: ./dist/script.js) 与源码 (如: ./src/index.js) 之间建立映射关系，从而当打包编译后的代码报错时，抛出的错误栈可以将错误出处映射到源码的相应位置
+
+当未配置 source maps 且有错误信息时：
+
+./src/index.js
+
+```javascript
+const element = documen.createElement('div'); // document typo error
+```
+
+npm run build 后运行 index.html (报错)
+
+```bash
+Uncaught ReferenceError: documen is not defined
+    at script.js:formatted:123
+    at Module.<anonymous> (script.js:formatted:129)
+    at n (script.js:formatted:11)
+    at script.js:formatted:71
+    at script.js:formatted:72
+(anonymous) @ script.js:formatted:123
+(anonymous) @ script.js:formatted:129
+n @ script.js:formatted:11
+(anonymous) @ script.js:formatted:71
+(anonymous) @ script.js:formatted:72
+```
+
+可以看到错误被定位到打包编译生成的 ./dist/script.js 中，不便于 debug
+
+```javascript
+// Chrome 控制台 Sources 中 formatted 处理过的 ./dist/script.js
+document.body.appendChild(function() {
+  const t = documen.createElement("div")  // document typo error
+    , e = new Image;
+  return e.src = o.a,
+  t.innerHTML = "Hello World",
+  t.appendChild(e),
+  t
+}())
+```
+
+webpack.config.js (配置 source maps)
+
+```javascript
+devtool: 'inline-source-map',
+```
+
+npm run build 后运行 index.html (报错)
+
+```bash
+Uncaught ReferenceError: documen is not defined
+    at index.js:5
+    at Module.<anonymous> (index.js:13)
+    at n (bootstrap:19)
+    at bootstrap:83
+    at bootstrap:83
+```
+
+错误被定位到了源码处 (./src/index.js)
+
+当设置为 inline-source-map 时，source maps 文件会以 DataUrl 的形式插入到打包编译生成的 ./dist/script.js 中
+
+./dist/script.js
+
+```javascript
+... // javascript code
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,
+eyJ2ZXJzaW9uIjozLCJzb3VyY2...
 ```
 
