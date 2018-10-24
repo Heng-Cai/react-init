@@ -761,3 +761,26 @@ Uncaught ReferenceError: documen is not defined
 eyJ2ZXJzaW9uIjozLCJzb3VyY2...
 ```
 
+## watch mode
+
+package.json
+
+```json
+{
+  "scripts": {
+    "watch": "webpack --watch",
+    "build": "webpack --config ./webpack.config.js"
+  }
+}
+
+// 等效于
+{
+  "scripts": {
+    "watch": "webpack --watch --config ./webpack.config.js",
+    "build": "webpack --config ./webpack.config.js"
+  }
+}
+```
+
+运行 npm run watch，进入 watch mode，当源文件发生改变时，会自动重新运行 npm run build
+
