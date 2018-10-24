@@ -567,3 +567,72 @@ Chrome 控制台 element
 - ./src/bg.png
 
 由于其大小超过 url-loader.limit 的限制，会用默认的 file-loader 来处理，被复制到 ./dist/img/53f4717a650a18c3ef5f081ea05de980.png
+
+# 输出管理
+
+## HtmlWebpackPlugin
+
+安装 html-webpack-plugin (自动生成 html)
+
+```javascript
+npm install --save-dev html-webpack-plugin
+```
+
+webpack.config.js
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+plugins: [
+  new HtmlWebpackPlugin({
+    title: 'react-init',
+  }),
+],
+```
+
+./dist/index.html (HtmlWebpackPlugin 自动生成的 html)
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>react-init</title>
+  </head>
+  <body>
+  <script type="text/javascript" src="script.js"></script></body>
+</html>
+```
+
+- 默认的 filename 为 index.html (可自定义)
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    filename: 'assets/admin.html',
+  }),
+],
+```
+
+- 生成的 html 输出路径
+
+```bash
+OUTPUT_PATH = output.path + html-webpack-plugin.filename
+```
+
+- 打包生成的 script.js 会默认插入到 html 的 `<body>` 底部 (可自定义)
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    inject: 'head',
+  }),
+],
+```
+
+> inject: true || 'head' || 'body' || false (默认为 true)
+>
+> - true || 'body' => 插入 `<body>` 底部
+> - false || 'head' => 插入 `<head>` 底部
+
+- 若将 css 从 script.js 中分离出去，分离出的 css 会已 `<link>` 标签插入到生成的 html 中

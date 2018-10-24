@@ -1,7 +1,14 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
   // 入口文件路径
   entry: './src/index.js',
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'react-init',
+    }),
+  ],
   output: {
     // 出口文件名
     filename: 'script.js',
