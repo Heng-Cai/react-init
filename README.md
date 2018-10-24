@@ -93,7 +93,7 @@ Entrypoint main = script.js
 
 将 css 转化为数组，并在数组中重写 toString() 方法，可将 css 转化为字符串
 
-安装 css-loader
+安装 [css-loader](https://github.com/webpack-contrib/css-loader)
 
 ```bash
 npm install --save-dev css-loader
@@ -178,7 +178,7 @@ Entrypoint main = script.js
 document.createElement('style');
 ```
 
-安装 css-loader
+安装 [style-loader](https://github.com/webpack-contrib/style-loader)
 
 ```bash
 npm install --save-dev style-loader
@@ -238,7 +238,7 @@ Chrome 控制台 element
 
 ### file-loader
 
-安装 file-loader
+安装 [file-loader](https://github.com/webpack-contrib/file-loader)
 
 ```bash
 npm install --save-dev file-loader
@@ -487,7 +487,7 @@ Chrome 控制台 element
 
 ### url-loader
 
-安装 url-loader
+安装 [url-loader](https://github.com/webpack-contrib/url-loader)
 
 ```bash
 npm install --save-dev url-loader
@@ -572,9 +572,9 @@ Chrome 控制台 element
 
 ## HtmlWebpackPlugin
 
-安装 html-webpack-plugin (自动生成 html)
+安装 [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) (自动生成 html)
 
-```javascript
+```bash
 npm install --save-dev html-webpack-plugin
 ```
 
@@ -636,3 +636,55 @@ plugins: [
 > - false || 'head' => 插入 `<head>` 底部
 
 - 若将 css 从 script.js 中分离出去，分离出的 css 会已 `<link>` 标签插入到生成的 html 中
+
+```diff
+CleanWebpackPlugin
+```
+
+## CleanWebpackPlugin
+
+安装 [clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin) (build 之前移除整个 build 文件夹)
+
+```bash
+npm install --save-dev clean-webpack-plugin
+```
+
+```javascript
+{
+  plugins: [
+    new CleanWebpackPlugin(paths [, options])
+    // paths: array<string>
+    // options: object
+  ]
+}
+```
+
+移除的文件夹路径：
+
+```bash
+REMOVE_PATH = (clean-webpack-plugin.options.root || __dirname) + paths
+```
+
+Webpack.config.js
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+plugins: [
+  new HtmlWebpackPlugin({
+    title: 'react-init',
+  }),
+  new CleanWebpackPlugin(['dist']), // 不一定需要放在最前面
+],
+```
+
+```bash
+npm run build
+
+# output
+clean-webpack-plugin: /Users/caiheng/workspace/react-init/dist has been removed.
+Hash: edccb81ab09906e93c01
+...
+```
+

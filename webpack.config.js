@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   // 入口文件路径
@@ -8,13 +9,14 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'react-init',
     }),
+    new CleanWebpackPlugin(['dist']),
   ],
   output: {
     // 出口文件名
     filename: 'script.js',
 
     // 出口文件路径
-    path: path.resolve(__dirname, 'dist'), // Node 环境下，__dirname 为当前文件所在的绝对路径
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
@@ -38,5 +40,5 @@ module.exports = {
         ],
       },
     ]
-  }
+  },
 };
