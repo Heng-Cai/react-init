@@ -371,7 +371,11 @@ module.exports = {
 设置 loader 文件输出的绝对路径：
 
 ```bash
-OUTPUT_PATH = output.path + (file-loader.outputPath || '') + file-loader.name
+output.path
++
+(file-loader.outputPath || '')
++
+file-loader.name
 ```
 
 因此当未设置 file-loader.outputPath 时，输出的图片的绝对路径为：
@@ -408,7 +412,7 @@ OUTPUT_PATH = output.path + (file-loader.outputPath || '') + file-loader.name
 
 # output.path
 /Users/xxx/workspace/react-init/dist
-# (file-loader.outputPath
+# file-loader.outputPath
 img/
 # file-loader.name
 53f4717a650a18c3ef5f081ea05de980.png
@@ -416,28 +420,63 @@ img/
 
 #### file-loader.publicPath
 
-默认值为 undefined 
+默认值为 undefined
 
-设置 loader 文件的引用路径：
+设置 loader 文件的引用路径 (相当于针对该 file-loader 重写了 output.publicPath，从而此设置项将变为该 file-loader 所打包编译文件的引用路径前缀)：
 
 ```bash
-PUBLIC_PATH = output.publicPath + (file-loader.publicPath || '') + file-loader.name
+# file-loader.publicPath 默认值为 output.publicPath 与 file-loader.outputPath 的拼接值
+file-loader.publicPath || (output.publicPath + (file-loader.outputPath || ''))
++
+file-loader.name
 ```
 
-因此当未设置 output.publicPath 以及 file-loader.publicPath 时，引用图片的路径为：
+- 当未设置 output.publicPath 以及 file-loader.publicPath 时，引用图片的路径为：
 
 ```bash
 /Users/xxx/workspace/react-init/53f4717a650a18c3ef5f081ea05de980.png
 
 # HTML page
 /Users/xxx/workspace/react-init
-# output.publicPath
+# output.publicPath + (file-loader.outputPath || '')
 ''
 # file-loader.name
 53f4717a650a18c3ef5f081ea05de980.png
 ```
 
-若设置 webpack.config.js
+- 若设置 webpack.config.js
+
+```javascript
+{
+  test: /\.(png|svg|jpg|gif)$/,
+  use: [
+    {
+      loader: 'file-loader',
+      options: {
+        outputPath: 'img/',
+        publicPath: '', // 或者不设置 publicPath
+      },
+    },
+  ],
+},
+```
+
+则引用路径变为为
+
+```bash
+/Users/xxx/workspace/react-init/img/53f4717a650a18c3ef5f081ea05de980.png
+
+# HTML page
+/Users/xxx/workspace/react-init
+# output.publicPath + (file-loader.outputPath || '')
+'img/'
+# file-loader.name
+53f4717a650a18c3ef5f081ea05de980.png
+```
+
+图片仍然无法显示
+
+- 若设置 webpack.config.js
 
 ```javascript
 {
@@ -461,8 +500,6 @@ PUBLIC_PATH = output.publicPath + (file-loader.publicPath || '') + file-loader.n
 
 # HTML page
 /Users/xxx/workspace/react-init
-# output.publicPath
-''
 # file-loader.publicPath
 'dist/img/'
 # file-loader.name
@@ -484,6 +521,14 @@ Chrome 控制台 element
 <img src="dist/img/53f4717a650a18c3ef5f081ea05de980.png"></img>
 </body>
 ```
+
+> html 中文件的引用路径为：
+>
+> ```bash
+> file-loader.publicPath || (output.publicPath + (file-loader.outputPath || ''))
+> +
+> file-loader.name
+> ```
 
 ### url-loader
 
