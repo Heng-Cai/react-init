@@ -6,10 +6,13 @@ module.exports = {
   // 入口文件路径
   entry: './src/index.js',
   devtool: 'inline-source-map',
+  devServer: {
+    contentBase: 'asset/',
+  },
   plugins: [
-    new HtmlWebpackPlugin({
-      title: 'react-init',
-    }),
+    // new HtmlWebpackPlugin({
+    //   title: 'html-webpack-plugin',
+    // }),
     new CleanWebpackPlugin(['dist']),
   ],
   output: {

@@ -682,10 +682,6 @@ plugins: [
 
 - 若将 css 从 script.js 中分离出去，分离出的 css 会已 `<link>` 标签插入到生成的 html 中
 
-```diff
-CleanWebpackPlugin
-```
-
 ## CleanWebpackPlugin
 
 安装 [clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin) (build 之前移除整个 build 文件夹)
@@ -828,4 +824,75 @@ package.json
 ```
 
 运行 npm run watch，进入 watch mode，当源文件发生改变时，会自动重新运行 npm run build
+
+## webpack-dev-server
+
+安装 [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+
+```bash
+npm install --save-dev webpack-dev-server
+```
+
+### devServer.contentBase
+
+设置服务器 origin (如: http://localhost:8080/) 所对应的本地文件的路径，以方便引用非 webpack 打包编译文件
+
+默认值为 webpack.config.js 所在的 __dirname
+
+webpack.config.js
+
+```javascript
+devServer: {
+  contentBase: 'asset/',
+},
+plugins: [
+  // 暂时不自动生成 html
+  // new HtmlWebpackPlugin({
+  //   title: 'html-webpack-plugin',
+  // }),
+  new CleanWebpackPlugin(['dist']),
+],
+```
+
+./asset/index.html
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>react-init-asset</title>
+  <link rel="stylesheet" href="./asset.css">
+</head>
+<body>
+  <div>react-init-asset</div>
+  <script src="./script.js"></script>
+</body>
+</html>
+```
+
+./asset/asset.css
+
+```css
+div {
+  border: 1px solid aqua;
+}
+```
+
+package.json
+
+```json
+{
+  "scripts": {
+    "start": "webpack-dev-server --open",
+  }
+}
+```
+
+运行 npm run start，浏览器会自动打开 http://localhost:8080/，由 devServer.contentBase 的配置，该 origin 即对应本地文件的 /Users/xxx/workspace/react-init/asset/ 路径
+
+浏览器会默认在 http://localhost:8080/ 下请求并渲染 index.html 文件，即渲染 /Users/xxx/workspace/react-init/asset/index.html (此时不存在 html-webpack-plugin 自动生成的 html)，同时 /Users/xxx/workspace/react-init/asset/asset.css 也得到了应用
+
+同时，webpack 打包编译生成的 script.js 也被引用渲染到 html 中，而它则是通过 devServer.publicPath 引用的
+
+
 
