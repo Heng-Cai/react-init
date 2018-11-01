@@ -835,7 +835,7 @@ npm install --save-dev webpack-dev-server
 
 ### devServer.contentBase
 
-设置服务器 origin (如: http://localhost:8080/) 所对应的本地文件的路径，以方便引用非 webpack 打包编译文件
+设置服务器 origin (如: http://localhost:8080) 所对应的本地文件路径，以方便引用非 webpack 打包编译的文件
 
 默认值为 webpack.config.js 所在的 __dirname
 
@@ -888,11 +888,88 @@ package.json
 }
 ```
 
-运行 npm run start，浏览器会自动打开 http://localhost:8080/，由 devServer.contentBase 的配置，该 origin 即对应本地文件的 /Users/xxx/workspace/react-init/asset/ 路径
+运行 npm run start，浏览器会自动打开 http://localhost:8080，由 devServer.contentBase 的配置，该 origin  对应本地文件路径为 /Users/xxx/workspace/react-init/asset/
 
 浏览器会默认在 http://localhost:8080/ 下请求并渲染 index.html 文件，即渲染 /Users/xxx/workspace/react-init/asset/index.html (此时不存在 html-webpack-plugin 自动生成的 html)，同时 /Users/xxx/workspace/react-init/asset/asset.css 也得到了应用
 
 同时，webpack 打包编译生成的 script.js 也被引用渲染到 html 中，而它则是通过 devServer.publicPath 引用的
+
+### devServer.publicPath
+
+设置 webpack 打包编译生成文件的基准引用路径，默认值为：'/'，基准路径为：
+
+```bash
+server.origin + devServer.publicPath
+```
+
+webpack-dev-server 不会将编译打包文件写入到本地存储中，而是存放在内存中，但仍然可以像 npm run build 那样理解，文件"输出"路径 output.path 为：
+
+```bash
+devServer.contentBase + devServer.publicPath
+```
+
+“输出”文件可以通过以下地址在浏览器中访问到：http://localhost:8080/webpack-dev-server
+
+- img
+  - [53f4717a650a18c3ef5f081ea05de980.png](http://localhost:8080/img/53f4717a650a18c3ef5f081ea05de980.png)
+- [script.js](http://localhost:8080/script.js)
+- [script](http://localhost:8080/script) (magic html for script.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/script))
+
+./asset/index.html 就根据 http://localhost:8080/script.js 引用到了打包编译生成的 script.js，
+
+若自动生成 html：webpack.config.js
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    title: 'html-webpack-plugin',
+  }),
+  new CleanWebpackPlugin(['dist']),
+],
+```
+
+运行 npm run start 浏览器会自动打开 http://localhost:8080，且优先渲染由 webpack 打包编译生成的 html，即渲染 http://localhost:8080/index.html，从而 /Users/xxx/workspace/react-init/asset/index.html 不再被渲染
+
+再次访问：http://localhost:8080/webpack-dev-server
+
+- img
+  - [53f4717a650a18c3ef5f081ea05de980.png](http://localhost:8080/img/53f4717a650a18c3ef5f081ea05de980.png)
+- [script.js](http://localhost:8080/script.js)
+- [script](http://localhost:8080/script) (magic html for script.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/script))
+- [index.html](http://localhost:8080/index.html)
+
+若设置devServer.publicPath：webpack.config.js
+
+```javascript
+devServer: {
+  contentBase: 'asset/',
+  publicPath: '/public/',
+},
+```
+
+再改变 ./asset/index.html
+
+```html
+<script src="./public/script.js"></script>
+```
+
+运行 npm run start 浏览器会自动打开 http://localhost:8080，再次渲染 /Users/xxx/workspace/react-init/asset/index.html，因为自动生成的 html 不在此路径下了，而且通过 http://localhost:8080/public/script.js 引用到了打包编译生成的 script.js
+
+再次访问：http://localhost:8080/webpack-dev-server
+
+- img
+  - [53f4717a650a18c3ef5f081ea05de980.png](http://localhost:8080/public/img/53f4717a650a18c3ef5f081ea05de980.png)
+- [script.js](http://localhost:8080/public/script.js)
+- [script](http://localhost:8080/public/script) (magic html for script.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/public/script))
+- [index.html](http://localhost:8080/public/index.html)
+
+因此访问 http://localhost:8080/public/ 才能渲染生成的 html
+
+> devServer.contentBase 用于设置服务器根路径所对用的本地文件路径
+>
+> devServer.publicPath 用于设置 webpack 打包编译的文件相对于服务器根路径 (或者服务器根路径对应的本地文件路径) 的相对路径
+
+
 
 
 
