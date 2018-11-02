@@ -366,7 +366,7 @@ module.exports = {
 
 #### file-loader.outputPath
 
-默认值为 `undefined`
+默认值为 undefined
 
 设置 loader 文件输出的绝对路径：
 
@@ -915,7 +915,7 @@ devServer.contentBase + devServer.publicPath
 - [script.js](http://localhost:8080/script.js)
 - [script](http://localhost:8080/script) (magic html for script.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/script))
 
-./asset/index.html 就根据 http://localhost:8080/script.js 引用到了打包编译生成的 script.js，
+./asset/index.html 就根据 http://localhost:8080/script.js 引用到了打包编译生成的 script.js
 
 若自动生成 html：webpack.config.js
 
@@ -954,6 +954,14 @@ devServer: {
 ```
 
 运行 npm run start 浏览器会自动打开 http://localhost:8080，再次渲染 /Users/xxx/workspace/react-init/asset/index.html，因为自动生成的 html 不在此路径下了，而且通过 http://localhost:8080/public/script.js 引用到了打包编译生成的 script.js
+
+> 此时可以认为打包编译的文件所在的路径为：/Users/xxx/workspace/react-init/asset/public/script.js
+>
+> 但 script.js 不在本地存储中，因此上述路径无法访问到 script.js 文件，而
+>
+> /Users/xxx/workspace/react-init/asset  <==对应==>  http://localhost:8080
+>
+> 因此可以通过  http://localhost:8080/public/script.js 访问到 script.js 文件
 
 再次访问：http://localhost:8080/webpack-dev-server
 
