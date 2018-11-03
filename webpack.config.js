@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   // 入口文件路径
@@ -9,12 +10,14 @@ module.exports = {
   devServer: {
     contentBase: 'asset/',
     publicPath: '/public/',
+    hot: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'html-webpack-plugin',
     }),
     new CleanWebpackPlugin(['dist']),
+    new webpack.HotModuleReplacementPlugin(),
   ],
   output: {
     // 出口文件名

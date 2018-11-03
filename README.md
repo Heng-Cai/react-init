@@ -977,7 +977,30 @@ devServer: {
 >
 > devServer.publicPath 用于设置 webpack 打包编译的文件相对于服务器根路径 (或者服务器根路径对应的本地文件路径) 的相对路径
 
+# 模块热替代
 
+webpack.config.js
+
+```javascript
+devServer: {
+  hot: true,
+},
+plugins: [
+  new webpack.HotModuleReplacementPlugin(),
+],
+```
+
+当更改 ./src/index.js 或其所引用到的其他文件 (js, css 等) 时，webpack 会使页面自动刷新以响应修改，同时当访问 http://localhost:8080/webpack-dev-server 时，webpack 会产生一些关于更改的 hot-updata 文件
+
+- img
+  - [53f4717a650a18c3ef5f081ea05de980.png](http://localhost:8081/public/img/53f4717a650a18c3ef5f081ea05de980.png)
+- [script.js](http://localhost:8081/public/script.js)
+- [script](http://localhost:8081/public/script) (magic html for script.js) ([webpack-dev-server](http://localhost:8081/webpack-dev-server/public/script))
+- [index.html](http://localhost:8081/public/index.html)
+- [7a338b372ebe5375c3e5.hot-update.json](http://localhost:8080/public/7a338b372ebe5375c3e5.hot-update.json)
+- [0.291e9e3314b2c0b8b62b.hot-update.js](http://localhost:8080/public/0.291e9e3314b2c0b8b62b.hot-update.js)
+- [0.291e9e3314b2c0b8b62b.hot-update](http://localhost:8080/public/0.291e9e3314b2c0b8b62b.hot-update) (magic html for 0.291e9e3314b2c0b8b62b.hot-update.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/public/0.291e9e3314b2c0b8b62b.hot-update))
+- [291e9e3314b2c0b8b62b.hot-update.json](http://localhost:8080/public/291e9e3314b2c0b8b62b.hot-update.json)
 
 
 
