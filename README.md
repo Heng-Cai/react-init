@@ -1002,5 +1002,131 @@ plugins: [
 - [0.291e9e3314b2c0b8b62b.hot-update](http://localhost:8080/public/0.291e9e3314b2c0b8b62b.hot-update) (magic html for 0.291e9e3314b2c0b8b62b.hot-update.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/public/0.291e9e3314b2c0b8b62b.hot-update))
 - [291e9e3314b2c0b8b62b.hot-update.json](http://localhost:8080/public/291e9e3314b2c0b8b62b.hot-update.json)
 
+# 生产环境配置
 
+## webpack-merge
+
+安装 [webpack-merge](https://github.com/survivejs/webpack-merge)
+
+```bash
+npm install --save-dev webpack-merge
+```
+
+切分 webpack.config.js 文件，区分生产与开发环境的 webpack 配置
+
+```diff
+- |- webpack.config.js
++ |- webpack.base.js
++ |- webpack.dev.js
++ |- webpack.prod.js
+```
+
+webpack.base.js (开发环境与生产环境通用配置)
+
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+module.exports = {
+  // 入口文件路径
+  entry: './src/index.js',
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'html-webpack-plugin',
+    }),
+    new CleanWebpackPlugin(['dist']),
+  ],
+  output: {
+    // 出口文件名
+    filename: 'script.js',
+
+    // 出口文件路径
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+      {
+        // 正则匹配
+        test: /\.css$/,
+        // 从右向左依次 loader
+        use: [ 'style-loader', 'css-loader' ],
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 50000,
+              outputPath: 'img/',
+              publicPath: 'dist/img/',
+            },
+          },
+        ],
+      },
+    ]
+  },
+};
+```
+
+webpack.dev.js (开发环境特定配置)
+
+```javascript
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const base = require('./webpack.base');
+
+module.exports = merge(base, {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: 'asset/',
+    publicPath: '/public/',
+    hot: true,
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+  ],
+});
+```
+
+webpack.prod.js (生产环境特定配置)
+
+```javascript
+const merge = require('webpack-merge');
+const base = require('./webpack.base');
+
+module.exports = merge(base, {
+  mode: 'production',
+  devtool: 'source-map',
+});
+```
+
+> 设置 mode: 'production'  (或不设置 mode) 时 webpack 会默认对打包编译的 script.js 做压缩处理
+>
+> 生产环境相对于开发环境做了更轻量级的 source maps
+
+package.json 也做相应修改 (指定 webpack 配置文件)
+
+```json
+"scripts": {
+  "start": "webpack-dev-server --open --config ./webpack.dev.js",
+  "build": "webpack --config ./webpack.prod.js"
+}
+```
+
+## process.env.NODE_ENV
+
+在 webpack v4 中，设置了 mode 之后，webpack 会自动利用 DefinePlugin 将 process.env.NODE_ENV 设置为相应 mode，而设置过程是在 webpack 的打包编译过程中进行的
+
+当在 webpack.config.js 中引用 process.env.NODE_ENV 时，会发现它始终是 undefined，原因在于在编译打包之前就读取了该配置文件，而那时 webpack 还未设置该值
+
+./sre/index.js (可在打包编译的源代码中引用该值)
+
+```javascript
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Looks like we are in development mode!');
+}
+```
 
