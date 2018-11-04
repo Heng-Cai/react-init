@@ -1130,3 +1130,106 @@ if (process.env.NODE_ENV !== 'production') {
 }
 ```
 
+# 代码分离
+
+## 多入口
+
+增加一个入口 ./src/module.js
+
+```javascript
+import './style.css';
+import Icon from './icon.png';
+
+function component() {
+  const element = document.createElement('div');
+  const imgElement = new Image();
+  imgElement.src = Icon;
+  element.innerHTML = 'module';
+  element.appendChild(imgElement);
+  return element;
+}
+
+document.body.appendChild(component());
+```
+
+配置 webpack.base.js
+
+```javascript
+entry: {
+  index: './src/index.js',
+  module: './src/module.js',
+},
+output: {
+  // 出口文件名
+  filename: '[name]_script.js',
+
+  // 出口文件路径
+  path: path.resolve(__dirname, 'dist'),
+},
+```
+
+> 由于采用了多入口文件，输出时也会有多个出口文件，将 output.filename 设置为固定值 'script.js' 会因文件重名而报错，因此修改为 '[name]_script.js'，其中的占位符 '[name]' 对应各入口文件的 key 值
+
+```bash
+npm run start
+
+# output
+Version: webpack 4.20.2
+Time: 1970ms
+Built at: 2018-11-04 18:47:23
+                                   Asset       Size  Chunks             Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB          [emitted]
+                         index_script.js    960 KiB   index  [emitted]  index
+                        module_script.js    960 KiB  module  [emitted]  module
+                              index.html  259 bytes          [emitted]
+```
+
+可以看到，index_script.js 与 module_script.js 大小一样，有很多重复的代码，可以通过 webpack 的 SplitChunksPlugin 将这些可以复用的代码抽离出来，从而减小输出体积
+
+webpack.base.js
+
+```javascript
+optimization: {
+  splitChunks: {
+    // 'all' 选择所有的输出文件进行重复代码抽离处理
+    chunks: 'all'
+  },
+},
+```
+
+```bash
+npm run start
+
+# output
+Version: webpack 4.20.2
+Time: 1788ms
+Built at: 2018-11-04 19:00:19
+                                   Asset       Size                Chunks             Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB                        [emitted]
+                         index_script.js   90.1 KiB                 index  [emitted]  index
+                        module_script.js   90.1 KiB                module  [emitted]  module
+          vendors~index~module_script.js    876 KiB  vendors~index~module  [emitted]  vendors~index~module
+                              index.html  336 bytes                        [emitted]
+```
+
+可以看到，可复用的重复代码已经被抽离到了 vendors~index~module_script.js
+
+同时，由 HtmlWebpackPlugin 自动生成的 html 也引入了所有的输出文件
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>html-webpack-plugin</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="vendors~index~module_script.js"></script>
+    <script type="text/javascript" src="index_script.js"></script>
+    <script type="text/javascript" src="module_script.js"></script>
+  </body>
+</html>
+```
+
+
+

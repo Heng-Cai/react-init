@@ -4,7 +4,10 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   // 入口文件路径
-  entry: './src/index.js',
+  entry: {
+    index: './src/index.js',
+    module: './src/module.js',
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'html-webpack-plugin',
@@ -13,7 +16,7 @@ module.exports = {
   ],
   output: {
     // 出口文件名
-    filename: 'script.js',
+    filename: '[name]_script.js',
 
     // 出口文件路径
     path: path.resolve(__dirname, 'dist'),
@@ -40,5 +43,10 @@ module.exports = {
         ],
       },
     ]
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    }
   },
 };
