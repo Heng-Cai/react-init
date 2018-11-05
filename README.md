@@ -1231,5 +1231,94 @@ img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB                        [emit
 </html>
 ```
 
+## 动态导入
 
+利用 import() 方法进行动态导入，该方法返回 promise
 
+新建 ./src/module.js
+
+```javascript
+export default function () {
+  console.log('Module has been dynamicly imported!');
+}
+```
+
+在 ./src/index.js 中动态导入 ./src/module.js
+
+```javascript
+function dynamicImport() {
+  return import(/* webpackChunkName: "module" */ './module')
+           .then(({ default: log }) => log());
+}
+
+function component() {
+  ...
+  const btnElement = document.createElement('button');
+  btnElement.onclick = dynamicImport
+  ...
+}
+
+document.body.appendChild(component());
+```
+
+webpack.base.js
+
+```javascript
+output: {
+  // 出口文件名
+  filename: 'script.js',
+  chunkFilename: '[name]_script.js',
+
+  // 出口文件路径
+  path: path.resolve(__dirname, 'dist'),
+},
+```
+
+> import() 中的 webpackChunkName 对应 output.chunkFilename 中的 '[name]' 占位符
+
+```bash
+npm run start
+
+# output
+Version: webpack 4.20.2
+Time: 1871ms
+Built at: 2018-11-05 22:42:19
+                                   Asset       Size  Chunks             Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB          [emitted]
+                               script.js    971 KiB    main  [emitted]  main
+                        module_script.js  910 bytes  module  [emitted]  module
+                              index.html  198 bytes          [emitted]
+```
+
+可以看到动态导入的 module_script.js 也会和其他文件一样打包编译，但通过 http://localhost:8080/ 控制台 Elements 以及 Networks 可以看到，该路径下渲染显示的 html 并未请求 module_script.js (import() 中的 webpackMode 默认值为 'lazy')，而仅请求了 script.js，html 中也没有引入 module_script.js
+
+当点击按钮时，页面才会发送网络请求，请求 module_script.js，此时会返回 404 错误，而请求的路径为：http://localhost:8080/module_script.js 而实际上，该资源的正确请求路径为：http://localhost:8080/public/module_script.js (webpack.dev.js 中有设置 devServer.publicPath: '/public/')
+
+可以看到，动态导入的资源的请求路径不受 devServer.publicPath 控制，而受 output.publicPath 控制，再次更改 webpack.base.js
+
+```javascript
+output: {
+  // 出口文件名
+  filename: 'script.js',
+  chunkFilename: '[name]_script.js',
+  publicPath: '/public/',
+
+  // 出口文件路径
+  path: path.resolve(__dirname, 'dist'),
+},
+```
+
+请求路径：
+
+```bash
+devServer.origin + output.publicPath + output.chunkFilename
+```
+
+这样就可以动态请求到 module_script.js 了，同时，html 也动态引入了该文件 (默认插入到 head 底部)
+
+```html
+<head>
+  ...
+  <script charset="utf-8" src="/public/module_script.js"></script>
+</head> 
+```
