@@ -1,6 +1,5 @@
 import './style.css';
 import Icon from './icon.png';
-import _ from 'lodash';
 
 function dynamicImport() {
   return import(/* webpackChunkName: "module" */ './module')

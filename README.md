@@ -1322,3 +1322,58 @@ devServer.origin + output.publicPath + output.chunkFilename
   <script charset="utf-8" src="/public/module_script.js"></script>
 </head> 
 ```
+
+# shimming
+
+引入 lodash，并应用
+
+./src/index.js
+
+```javascript
+import _ from 'lodash';
+...
+element.innerHTML = _.join(['Hello', 'World'], ' ');
+```
+
+./src/module.js
+
+```javascript
+import _ from 'lodash';
+...
+console.log(_.join(['Module has been', 'dynamicly imported!'], ' '));
+```
+
+## shimming 全局变量
+
+利用 webpack 插件 ProvidePlugin 将 lodash 设置成全局变量，从而在源码中不需要 import 就可以应用，而 webpack 遇到这些全局变量后，会自动将其加入打包编译文件中
+
+webpack.config.js
+
+```javascript
+const webpack = require('webpack');
+
+plugins: [
+  new webpack.ProvidePlugin({
+    _: 'lodash',
+  }),
+],
+```
+
+在 ./src/index.js 和 ./src/module.js 中直接使用 (不再 import)
+
+```bash
+npm run build
+
+# output
+Version: webpack 4.20.2
+Time: 2052ms
+Built at: 2018-11-07 15:20:43
+                                   Asset       Size  Chunks             Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB          [emitted]
+                               script.js   2.31 MiB    main  [emitted]  main
+                        module_script.js   1.09 KiB  module  [emitted]  module
+                              index.html  198 bytes   
+```
+
+可以看到 script.js 与 module_script.js 体积都有增大
+

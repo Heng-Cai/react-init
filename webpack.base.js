@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -10,6 +11,9 @@ module.exports = {
       title: 'html-webpack-plugin',
     }),
     new CleanWebpackPlugin(['dist']),
+    new webpack.ProvidePlugin({
+      _: 'lodash',
+    }),
   ],
   output: {
     // 出口文件名
