@@ -1375,5 +1375,47 @@ img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB          [emitted]
                               index.html  198 bytes   
 ```
 
-可以看到 script.js 与 module_script.js 体积都有增大
+可以看到 script.js 与 module_script.js 体积都有增大，当只需要用到全局变量的某一个属性时，还可这样设置
+
+webpack.config.js
+
+```javascript
+const webpack = require('webpack');
+
+plugins: [
+  new webpack.ProvidePlugin({
+    // _: 'lodash',
+    _join: ['lodash', 'join'],
+  }),
+],
+```
+
+在 ./src/index.js 和 ./src/module.js 中直接使用 (通过 _join 使用)
+
+```bash
+npm run build
+
+# output
+Version: webpack 4.20.2
+Time: 2084ms
+Built at: 2018-11-07 18:07:13
+                                   Asset       Size  Chunks             Chunk Names
+img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB          [emitted]
+                               script.js   2.31 MiB    main  [emitted]  main
+                        module_script.js    1.1 KiB  module  [emitted]  module
+                              index.html  198 bytes          [emitted]
+```
+
+> 可以看到，script.js 与 module_script.js 体积并没有如预期的那样有所减小，虽然只用到了 _.join，webpack 仍然将其他的“无用”代码打包编译出来了
+
+ProvidePlugins 的两种用法
+
+```js
+new webpack.ProvidePlugin({
+  // 某个库
+  identifier: 'module1',
+  // 某个库下的某个方法
+  identifier: ['module1', 'property1'],
+});
+```
 

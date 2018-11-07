@@ -13,7 +13,7 @@ function component() {
   btnElement.onclick = dynamicImport
   const imgElement = new Image();
   imgElement.src = Icon;
-  element.innerHTML = _.join(['Hello', 'World'], ' ');
+  element.innerHTML = _join(['Hello', 'World'], ' ');
   element.appendChild(imgElement);
   element.appendChild(btnElement);
   return element;

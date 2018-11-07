@@ -12,7 +12,8 @@ module.exports = {
     }),
     new CleanWebpackPlugin(['dist']),
     new webpack.ProvidePlugin({
-      _: 'lodash',
+      // _: 'lodash',
+      _join: ['lodash', 'join'],
     }),
   ],
   output: {
