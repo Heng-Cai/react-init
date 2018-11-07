@@ -1,5 +1,6 @@
 import './style.css';
 import Icon from './icon.png';
+import _ from 'lodash';
 
 function dynamicImport() {
   return import(/* webpackChunkName: "module" */ './module')
@@ -13,7 +14,7 @@ function component() {
   btnElement.onclick = dynamicImport
   const imgElement = new Image();
   imgElement.src = Icon;
-  element.innerHTML = 'Hello World';
+  element.innerHTML = _.join(['Hello', 'World'], ' ');
   element.appendChild(imgElement);
   element.appendChild(btnElement);
   return element;
