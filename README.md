@@ -1496,7 +1496,7 @@ npm install --save-dev @babel/plugin-syntax-dynamic-import
     "@babel/preset-env"
   ],
   "plugins": [
-	"@babel/plugin-syntax-dynamic-import"
+		"@babel/plugin-syntax-dynamic-import"
   ]
 }
 ```
@@ -1543,11 +1543,71 @@ Please remove the `import '@babel/polyfill'` call or use `useBuiltIns: 'entry'` 
 ./src/index.js
 
 ```javascript
-import '@babel/polyfill';
+import '@babel/polyfill'; // 最上方引入
 ...
 ```
 
 - "useBuiltIns": false (或不设置)
 
 需要在 webpack.config.js 中引入 @babel/polyfill
+
+webpack.base.js
+
+```javascript
+entry: {
+  polyfill: '@babel/polyfill',  // 入口文件新增 polyfill
+  index: './src/index.js',
+},
+output: {
+  filename: '[name]_script.js', // 响应多入口
+},
+```
+
+./asset/index.html
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>react-init-asset</title>
+  <link rel="stylesheet" href="./asset.css">
+  <script src="./public/polyfill_script.js"></script> // 先载入 polyfill
+</head>
+<body>
+  <div>react-init-asset</div>
+  <script src="./public/index_script.js"></script>
+</body>
+</html>
+```
+
+npm run start 之后
+
+http://localhost:8080/ 将渲染 /Users/xxx/workspace/react-init/asset/index.html 
+
+> 可以根据环境不同，对 polyfill 进行按需动态加载
+
+http://localhost:8080/public/ 将渲染 HtmlWebpackPlugin 自动生成的 html
+
+```html
+<body>
+  <script type="text/javascript" src="/public/polyfill_script.js"></script>
+  <script type="text/javascript" src="/public/index_script.js"></script>
+  ...
+</body>
+```
+
+> 为了让 polyfill 先加载运行，应将其排在入口文件的第一位
+
+#### 单独配置 @babel/polyfill
+
+配置方法与"useBuiltIns": false (或不设置) 采用的方法相同，即用 webpack 来配置多入口文件
+
+这两种情况还有一种不推荐的做法，即直接在 source code 的入口文件最上方引入 polyfill
+
+./src/index.js
+
+```javascript
+import '@babel/polyfill'; // 最上方引入
+...
+```
 

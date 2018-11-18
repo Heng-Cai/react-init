@@ -5,7 +5,10 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   // 入口文件路径
-  entry: './src/index.js',
+  entry: {
+    polyfill: '@babel/polyfill',
+    index: './src/index.js',
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'html-webpack-plugin',
@@ -18,7 +21,7 @@ module.exports = {
   ],
   output: {
     // 出口文件名
-    filename: 'script.js',
+    filename: '[name]_script.js',
     chunkFilename: '[name]_script.js',
     publicPath: '/public/',
 
