@@ -1,4 +1,6 @@
-# webpack 安装
+# webpack
+
+## webpack 安装
 
 ```bash
 npm install --save-dev webpack
@@ -8,7 +10,7 @@ npm install --save-dev webpack-cli
 
 > 项目目录：/Users/xxx/workspace/react-init <=> ./
 
-# webpack 起步
+## webpack 起步
 
 - index.html
 
@@ -85,11 +87,11 @@ Entrypoint main = script.js
 [0] ./src/index.js 170 bytes {0} [built]
 ```
 
-# 静态资源管理
+## 静态资源管理
 
-## css
+### css
 
-### css-loader
+#### css-loader
 
 将 css 转化为数组，并在数组中重写 toString() 方法，可将 css 转化为字符串
 
@@ -170,7 +172,7 @@ Entrypoint main = script.js
 >
 > ./src/_part.css <=> 3
 
-### style-loader
+#### style-loader
 
 将 css-loader toString() 之后的 css 字符串以 `<style>` 标签包裹，并在页面加载时动态插入 `<head>` (查看源代码的 index.html 不会变化)
 
@@ -234,9 +236,9 @@ Chrome 控制台 element
 
 > [3], [4] 打包编号对应动态插入的两个 `<style>` 标签
 
-## image
+### image
 
-### file-loader
+#### file-loader
 
 安装 [file-loader](https://github.com/webpack-contrib/file-loader)
 
@@ -530,7 +532,7 @@ Chrome 控制台 element
 > file-loader.name
 > ```
 
-### url-loader
+#### url-loader
 
 安装 [url-loader](https://github.com/webpack-contrib/url-loader)
 
@@ -613,9 +615,9 @@ Chrome 控制台 Elements
 
 由于其大小超过 url-loader.limit 的限制，会用默认的 file-loader 来处理，被复制到 ./dist/img/53f4717a650a18c3ef5f081ea05de980.png
 
-# 输出管理
+## 输出管理
 
-## HtmlWebpackPlugin
+### HtmlWebpackPlugin
 
 安装 [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) (自动生成 html)
 
@@ -682,7 +684,7 @@ plugins: [
 
 - 若将 css 从 script.js 中分离出去，分离出的 css 会已 `<link>` 标签插入到生成的 html 中
 
-## CleanWebpackPlugin
+### CleanWebpackPlugin
 
 安装 [clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin) (build 之前移除整个 build 文件夹)
 
@@ -729,9 +731,9 @@ Hash: edccb81ab09906e93c01
 ...
 ```
 
-# 开发环境配置
+## 开发环境配置
 
-## source maps
+### source maps
 
 将打包编译后的代码 (如: ./dist/script.js) 与源码 (如: ./src/index.js) 之间建立映射关系，从而当打包编译后的代码报错时，抛出的错误栈可以将错误出处映射到源码的相应位置
 
@@ -802,7 +804,7 @@ Uncaught ReferenceError: documen is not defined
 eyJ2ZXJzaW9uIjozLCJzb3VyY2...
 ```
 
-## watch mode
+### watch mode
 
 package.json
 
@@ -825,7 +827,7 @@ package.json
 
 运行 npm run watch，进入 watch mode，当源文件发生改变时，会自动重新运行 npm run build
 
-## webpack-dev-server
+### webpack-dev-server
 
 安装 [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
 
@@ -833,7 +835,7 @@ package.json
 npm install --save-dev webpack-dev-server
 ```
 
-### devServer.contentBase
+#### devServer.contentBase
 
 设置服务器 origin (如: http://localhost:8080) 所对应的本地文件路径，以方便引用非 webpack 打包编译的文件
 
@@ -894,7 +896,7 @@ package.json
 
 同时，webpack 打包编译生成的 script.js 也被引用渲染到 html 中，而它则是通过 devServer.publicPath 引用的
 
-### devServer.publicPath
+#### devServer.publicPath
 
 设置 webpack 打包编译生成文件的基准引用路径，默认值为：'/'，基准路径为：
 
@@ -977,7 +979,7 @@ devServer: {
 >
 > devServer.publicPath 用于设置 webpack 打包编译的文件相对于服务器根路径 (或者服务器根路径对应的本地文件路径) 的相对路径
 
-# 模块热替代
+## 模块热替代
 
 webpack.config.js
 
@@ -1002,9 +1004,9 @@ plugins: [
 - [0.291e9e3314b2c0b8b62b.hot-update](http://localhost:8080/public/0.291e9e3314b2c0b8b62b.hot-update) (magic html for 0.291e9e3314b2c0b8b62b.hot-update.js) ([webpack-dev-server](http://localhost:8080/webpack-dev-server/public/0.291e9e3314b2c0b8b62b.hot-update))
 - [291e9e3314b2c0b8b62b.hot-update.json](http://localhost:8080/public/291e9e3314b2c0b8b62b.hot-update.json)
 
-# 生产环境配置
+## 生产环境配置
 
-## webpack-merge
+### webpack-merge
 
 安装 [webpack-merge](https://github.com/survivejs/webpack-merge)
 
@@ -1116,7 +1118,7 @@ package.json 也做相应修改 (指定 webpack 配置文件)
 }
 ```
 
-## process.env.NODE_ENV
+### process.env.NODE_ENV
 
 在 webpack v4 中，设置了 mode 之后，webpack 会自动利用 DefinePlugin 将 process.env.NODE_ENV 设置为相应 mode，而设置过程是在 webpack 的打包编译过程中进行的
 
@@ -1130,9 +1132,9 @@ if (process.env.NODE_ENV !== 'production') {
 }
 ```
 
-# 代码分离
+## 代码分离
 
-## 多入口
+### 多入口
 
 增加一个入口 ./src/module.js
 
@@ -1231,7 +1233,7 @@ img/53f4717a650a18c3ef5f081ea05de980.png    279 KiB                        [emit
 </html>
 ```
 
-## 动态导入
+### 动态导入
 
 利用 import() 方法进行动态导入，该方法返回 promise
 
@@ -1323,7 +1325,7 @@ devServer.origin + output.publicPath + output.chunkFilename
 </head> 
 ```
 
-# shimming
+## shimming
 
 引入 lodash，并应用
 
@@ -1343,7 +1345,7 @@ import _ from 'lodash';
 console.log(_.join(['Module has been', 'dynamicly imported!'], ' '));
 ```
 
-## shimming 全局变量
+### shimming 全局变量
 
 利用 webpack 插件 ProvidePlugin 将 lodash 设置成全局变量，从而在源码中不需要 import 就可以应用，而 webpack 遇到这些全局变量后，会自动将其加入打包编译文件中
 
