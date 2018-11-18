@@ -1421,3 +1421,133 @@ new webpack.ProvidePlugin({
 });
 ```
 
+## 配置 babel
+
+安装
+
+```bash
+npm install --save-dev babel-loader @babel/core @babel/preset-env
+```
+
+- @babel/core
+
+主要用于代码的 transform 和 paser
+
+- @babel/preset-env
+
+preset 为一组功能相关的 plugins 的总称，preset-env 用于将 ES2015+解析转化为 ES5，preset-react 则用于处理 react 相关代码
+
+webpack.base.js
+
+```javascript
+module: {
+  rules: [
+    ...,
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: "babel-loader"
+    },
+  ]
+}
+```
+
+.babelrc (babel 配置文件 json)
+
+```json
+{
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "plugins": []
+}
+```
+
+```bash
+npm run start
+
+# output
+ERROR in ./src/index.js
+Module build failed (from ./node_modules/babel-loader/lib/index.js):
+SyntaxError: /Users/caiheng/workspace/react-init/src/index.js: Support for the experimental syntax 'dynamicImport' isn't currently enabled (5:10):
+
+  3 |
+  4 | function dynamicImport() {
+> 5 |   return import(/* webpackChunkName: "module" */ './module')
+    |          ^
+  6 |            .then(({ default: log }) => log());
+  7 | }
+  8 |
+
+Add @babel/plugin-syntax-dynamic-import (https://git.io/vb4Sv) to the 'plugins' section of your Babel config to enable parsing
+```
+
+运行时，会提示 @babel/preset-env 不支持动态导入的写法，需要额外安装插件
+
+```bash
+npm install --save-dev @babel/plugin-syntax-dynamic-import
+```
+
+并配置 .babelrc
+
+```json
+{
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "plugins": [
+	"@babel/plugin-syntax-dynamic-import"
+  ]
+}
+```
+
+### 配置 @babel/polyfill
+
+安装 @babel/polyfill
+
+```bash
+npm install --save @babel/polyfill
+```
+
+#### 与 @babel/preset-env 一起使用
+
+```json
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry" | 'usage' | false
+      }
+    ]
+  ]
+}
+```
+
+- "useBuiltIns": "usage"
+
+在 webpack.config.js 以及 source code 中均不需要 import / require @babel/polyfill，如果引入了，babel 会有提示
+
+```bash
+npm run start
+
+# output
+When setting `useBuiltIns: 'usage'`, polyfills are automatically imported when needed.
+Please remove the `import '@babel/polyfill'` call or use `useBuiltIns: 'entry'` instead.
+```
+
+- "useBuiltIns": "entry"
+
+需要在 source code 的入口文件的最上方 import / require @babel/polyfill (最上方以确保最先引入 polyfill)
+
+./src/index.js
+
+```javascript
+import '@babel/polyfill';
+...
+```
+
+- "useBuiltIns": false (或不设置)
+
+需要在 webpack.config.js 中引入 @babel/polyfill
+
