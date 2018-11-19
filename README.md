@@ -1638,3 +1638,49 @@ webpack.base.js
 
 ./src/_part.css => ./src/\_part.scss
 
+### 分离 css
+
+安装插件 [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+
+```bash
+npm install --save-dev mini-css-extract-plugin
+```
+
+利用 mini-css-extract-plugin 插件的 loader 代替 style-loader 以使 css 从 js 中分离出来
+
+webpack.base.js
+
+```javascript
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+  plugins: [
+    ...
+    new MiniCssExtractPlugin({
+      filename: 'style.css',
+    }),
+  ],
+  module: {
+    rules: [
+      ...
+      {
+        // 正则匹配
+        test: /\.(css|scss)$/,
+        // 从右向左依次 loader
+        use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ],
+      },
+    ]
+  },
+};
+```
+
+./asset/index.html (引入分离出来的 css)
+
+```html
+<head>
+  ...
+  <link rel="stylesheet" href="./public/style.css">
+</head>
+```
+
+npm run start 后，http://localhost:8080/ 渲染的 ./asset/index.html 便应用到了该样式

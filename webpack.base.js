@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   // 入口文件路径
@@ -17,6 +18,9 @@ module.exports = {
     new webpack.ProvidePlugin({
       // _: 'lodash',
       _join: ['lodash', 'join'],
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'style.css',
     }),
   ],
   output: {
@@ -34,7 +38,7 @@ module.exports = {
         // 正则匹配
         test: /\.(css|scss)$/,
         // 从右向左依次 loader
-        use: [ 'style-loader', 'css-loader', 'sass-loader' ],
+        use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
