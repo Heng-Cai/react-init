@@ -1611,3 +1611,30 @@ import '@babel/polyfill'; // 最上方引入
 ...
 ```
 
+## 配置 sass
+
+安装 [node-sass](https://github.com/sass/node-sass) 与 [sass-loader](https://github.com/webpack-contrib/sass-loader)
+
+```bash
+npm install sass-loader node-sass --save-dev
+```
+
+webpack.base.js
+
+```javascript
+{
+  // 正则匹配
+  test: /\.(css|scss)$/,
+  // 从右向左依次 loader
+  use: [
+    "style-loader", // creates style nodes from JS strings
+    "css-loader", // translates CSS into JS strings
+    "sass-loader" // compiles Sass to CSS, using Node Sass by default
+  ],
+}
+```
+
+./src/style.css => ./src/style.scss
+
+./src/_part.css => ./src/\_part.scss
+

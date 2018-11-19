@@ -32,9 +32,9 @@ module.exports = {
     rules: [
       {
         // 正则匹配
-        test: /\.css$/,
+        test: /\.(css|scss)$/,
         // 从右向左依次 loader
-        use: [ 'style-loader', 'css-loader' ],
+        use: [ 'style-loader', 'css-loader', 'sass-loader' ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
